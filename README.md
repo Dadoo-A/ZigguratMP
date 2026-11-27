@@ -116,11 +116,9 @@ ZigguratMP/
 
 ## Status and roadmap
 
-- [x] Lobby, same run and floors, host enemies, cross-player combat
-- [x] Shared character select, shared XP and keys, 3D bodies and animations, shot replication
-- [x] Downed/revive, boss phases and status effects on clients, difficulty scaling, ally HUD
-- [ ] Traps sync, challenge and gauntlet modes validated in multiplayer
-- [ ] Installer / auto-update
+Working today: lobby and shared character select; same run, floors and map; host-authoritative enemies; 3D allies with animations and replicated shots; downed/revive; boss stages and status effects mirrored; shared XP and keys; ally HUD.
+
+The detailed co-op roadmap is in **[ROADMAP.md](ROADMAP.md)**: what in Ziggurat 2's single-player design has to change for co-op (pauses that stop time, locked fight rooms, boss trigger, special fight objectives, portal, campaign rewards, summons, game modes).
 
 Bug reports are welcome: please attach `BepInEx/LogOutput.log` from **every** player.
 
