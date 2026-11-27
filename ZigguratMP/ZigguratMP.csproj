@@ -12,6 +12,9 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <DebugType>portable</DebugType>
+    <!-- Never bake local paths into the DLL (PDB path, source paths): releases are public. -->
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildProjectDirectory)=ZigguratMP</PathMap>
 
     <!-- Game folder: pass -p:GameDir="X:\path\Ziggurat 2", or put a GameDir property in a local
          (git-ignored) GameDir.props.user next to this file. Default = standard Steam location. -->
