@@ -21,6 +21,14 @@ namespace ZigguratMP.UI
         {
             if (map == null || map.Root == null || map.Player == null) return;
             seen.Clear();
+            // Marker must end up the same on-screen size as the local player's arrow, whatever the
+            // root's scale is right now (Start may not have scaled it yet; settings/resolution
+            // changes rescale it). Never trust map.Scale alone: 1/Scale on an unscaled root made a
+            // screen-filling arrow.
+            Vector3 want = map.Player.transform.lossyScale, rootScale = map.Root.transform.lossyScale;
+            bool scaleOk = Mathf.Abs(rootScale.x) > 1e-4f && Mathf.Abs(rootScale.y) > 1e-4f && map.Root.activeInHierarchy;
+            Vector3 local = scaleOk ? new Vector3(want.x / rootScale.x, want.y / rootScale.y, 1f) : Vector3.one;
+            if (!scaleOk || local.x > 20f || local.y > 20f || float.IsNaN(local.x) || float.IsNaN(local.y)) { HideAll(); return; }
             foreach (RemotePlayers.GhostView g in RemotePlayers.VisibleGhosts())
             {
                 seen.Add(g.Name);
@@ -31,9 +39,8 @@ namespace ZigguratMP.UI
                     markers[g.Name] = rt;
                 }
                 if (!rt.gameObject.activeSelf) rt.gameObject.SetActive(true);
-                float scale = Mathf.Max(0.01f, map.Scale);
                 rt.anchoredPosition = new Vector2(g.Position.x, g.Position.z);
-                rt.localScale = Vector3.one / scale; // root is scaled by Scale; keep marker at UI size
+                rt.localScale = local;
                 rt.localRotation = Quaternion.AngleAxis(g.Yaw, -Vector3.forward);
                 Image img = rt.GetComponentInChildren<Image>();
                 if (img != null) img.color = g.Downed ? new Color(1f, 0.3f, 0.3f) : new Color(0.3f, 0.95f, 1f);
@@ -42,10 +49,19 @@ namespace ZigguratMP.UI
                 if (kv.Value != null && !seen.Contains(kv.Key) && kv.Value.gameObject.activeSelf) kv.Value.gameObject.SetActive(false);
         }
 
+        private void HideAll()
+        {
+            foreach (RectTransform rt in markers.Values)
+                if (rt != null && rt.gameObject.activeSelf) rt.gameObject.SetActive(false);
+        }
+
         private RectTransform CreateMarker(string name)
         {
             GameObject copy = Instantiate(map.Player, map.Root.transform, false);
             copy.name = "ZMP_Ally_" + name;
+            // Only the arrow itself: drop any child decoration of the player marker.
+            for (int i = copy.transform.childCount - 1; i >= 0; i--)
+                if (copy.transform.GetChild(i).GetComponent<Graphic>() == null) Destroy(copy.transform.GetChild(i).gameObject);
             foreach (MonoBehaviour mb in copy.GetComponentsInChildren<MonoBehaviour>(true))
                 if (!(mb is Graphic)) Destroy(mb); // keep only the visuals
             RectTransform rt = copy.GetComponent<RectTransform>();

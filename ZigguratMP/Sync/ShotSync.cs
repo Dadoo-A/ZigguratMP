@@ -129,14 +129,31 @@ namespace ZigguratMP.Sync
         // ------------------------------------------------------------------ weapon fx
 
         /// <summary>Player.WeaponShoot postfix (once per trigger pull / burst shot).</summary>
-        public static void OnLocalWeaponShoot(int attackIndex)
+        public static void OnLocalWeaponShoot(int attackIndex) => SendWeaponFx(attackIndex, RemotePlayers.FxShoot);
+
+        /// <summary>Weapon charge / cooldown events of the local player's weapon.</summary>
+        public static void OnLocalWeaponEvent(Weapon w, int attackIndex, byte kind)
+        {
+            Player p = LocalPlayerAccess.Get();
+            if (p == null || w == null || w.Player != p) return;
+            SendWeaponFx(attackIndex, kind);
+        }
+
+        private static void SendWeaponFx(int attackIndex, byte kind)
         {
             if (!Active) return;
-            Session.Begin(MsgType.WeaponFx).Write((byte)Mathf.Clamp(attackIndex, 0, 255));
+            BinaryWriter w = Session.Begin(MsgType.WeaponFx);
+            w.Write((byte)Mathf.Clamp(attackIndex, 0, 255));
+            w.Write(kind);
             Session.SendBuiltToAll(false);
         }
 
-        public static void OnWeaponFx(CSteamID from, BinaryReader r) => RemotePlayers.OnRemoteFire(from, r.ReadByte());
+        public static void OnWeaponFx(CSteamID from, BinaryReader r)
+        {
+            byte idx = r.ReadByte();
+            byte kind = r.ReadByte();
+            RemotePlayers.OnRemoteFire(from, idx, kind);
+        }
 
         // ------------------------------------------------------------------ beams
 

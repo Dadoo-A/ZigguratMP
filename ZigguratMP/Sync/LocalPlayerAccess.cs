@@ -38,7 +38,9 @@ namespace ZigguratMP.Sync
             };
             try
             {
-                state.Velocity = p.Velocity;
+                Vector3 v = p.Velocity;
+                // Velocity = displacement / deltaTime: NaN/Infinity on zero-time frames (alt-tab, pause).
+                state.Velocity = float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z) || float.IsInfinity(v.sqrMagnitude) ? Vector3.zero : v;
                 byte f = 0;
                 if (p.IsGrounded) f |= PlayerStateMsg.FlagGrounded;
                 if (p.Controller != null && p.Controller.IsDashing) f |= PlayerStateMsg.FlagDashing;

@@ -28,6 +28,18 @@ namespace ZigguratMP.Patches
         private static void Postfix(int attackIndex) => ShotSync.OnLocalWeaponShoot(attackIndex);
     }
 
+    [HarmonyPatch(typeof(Weapon), "WeaponAttackCharge")]
+    internal static class WeaponChargePatch
+    {
+        private static void Postfix(Weapon __instance, int attackIndex) => ShotSync.OnLocalWeaponEvent(__instance, attackIndex, RemotePlayers.FxCharge);
+    }
+
+    [HarmonyPatch(typeof(Weapon), "WeaponAttackCooldown")]
+    internal static class WeaponCooldownPatch
+    {
+        private static void Postfix(Weapon __instance, int attackIndex) => ShotSync.OnLocalWeaponEvent(__instance, attackIndex, RemotePlayers.FxCooldown);
+    }
+
     /// <summary>
     /// Replayed (remote) projectiles never deal damage, on any kind of character
     /// (Enemy.Hurt is handled in <see cref="EnemyHurtPatch"/>).

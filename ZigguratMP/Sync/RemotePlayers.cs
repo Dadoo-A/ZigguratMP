@@ -46,6 +46,9 @@ namespace ZigguratMP.Sync
             public bool HasDisplayPos;
             public bool Downed;
             public float Health = 1f;
+            public float LastFxTime;
+            public AudioSource LoopAudio;
+            public bool Shooting;
         }
 
         private static readonly Dictionary<CSteamID, Ghost> ghosts = new Dictionary<CSteamID, Ghost>();
@@ -117,7 +120,16 @@ namespace ZigguratMP.Sync
                     else Object.Destroy(wa.LeftHand);
                 }
             }
-            foreach (Animator a in w.GetComponentsInChildren<Animator>(true)) a.enabled = false; // FP animations
+            // Keep the weapon's own Animator (idle/charge/attack animation of the weapon model) and
+            // let the disabled WeaponAnimator drive it through its WeaponState property.
+            Animator weaponAnim = w.GetComponentInChildren<Animator>(true);
+            if (wa != null && weaponAnim != null)
+            {
+                weaponAnim.enabled = true;
+                weaponAnim.applyRootMotion = false;
+                weaponAnim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                WeaponAnimatorRef(wa) = weaponAnim;
+            }
             foreach (Collider c in w.GetComponentsInChildren<Collider>(true)) Object.Destroy(c);
             foreach (Transform t in w.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = 0;
             foreach (Renderer r in w.GetComponentsInChildren<Renderer>(true))
@@ -154,19 +166,78 @@ namespace ZigguratMP.Sync
         }
 
         /// <summary>Remote player fired attack <paramref name="attackIndex"/>: muzzle fx, sound, recoil.</summary>
-        public static void OnRemoteFire(CSteamID from, int attackIndex)
+        private static readonly HarmonyLib.AccessTools.FieldRef<WeaponAnimator, Animator> WeaponAnimatorRef =
+            HarmonyLib.AccessTools.FieldRefAccess<WeaponAnimator, Animator>("weaponAnimator");
+
+        public const byte FxShoot = 0, FxCharge = 1, FxCooldown = 2;
+
+        /// <summary>Remote weapon event: shoot (muzzle fx, sound, recoil), charge, or cooldown.</summary>
+        public static void OnRemoteFire(CSteamID from, int attackIndex, byte kind)
         {
             if (!ghosts.TryGetValue(from, out Ghost g) || g.Go == null || !g.Go.activeSelf) return;
-            g.BodyAnim?.Fire();
+            if (kind == FxShoot) g.BodyAnim?.Fire();
             WeaponAnimator wa = g.WeaponFx;
             if (wa == null || g.Weapon == null || !g.Weapon.activeInHierarchy) return;
             WeaponAnimator.AttackEffects fx = attackIndex <= 0 ? wa.MainAttack : wa.SecondaryAttack;
+            g.LastFxTime = Time.time;
             try
             {
-                if (fx.ShootFx != null) fx.ShootFx.Play();
-                if (fx.ShootSound != null && !fx.ShootSound.IsLoop && g.Audio != null) fx.ShootSound.Play(g.Audio);
+                switch (kind)
+                {
+                    case FxShoot:
+                        // State first: changing state stops the shoot particles.
+                        wa.WeaponState = attackIndex <= 0 ? WeaponAnimator.WeaponStates.Attack1 : WeaponAnimator.WeaponStates.Attack2;
+                        if (fx.ShootFx != null) fx.ShootFx.Play();
+                        if (fx.ShootSound != null && g.Audio != null)
+                        {
+                            if (!fx.ShootSound.IsLoop) fx.ShootSound.Play(g.Audio);
+                            else StartLoop(g, fx.ShootSound);
+                        }
+                        break;
+                    case FxCharge:
+                        wa.WeaponState = WeaponAnimator.WeaponStates.Charging;
+                        if (fx.ChargeFx != null) fx.ChargeFx.Play();
+                        if (fx.ChargeSound != null && g.Audio != null) fx.ChargeSound.Play(g.Audio);
+                        break;
+                    case FxCooldown:
+                        if (fx.CooldownFx != null) fx.CooldownFx.Play();
+                        if (fx.CooldownSound != null && g.Audio != null) fx.CooldownSound.Play(g.Audio);
+                        break;
+                }
             }
             catch (System.Exception e) { Plugin.Log.LogDebug($"remote fx: {e.Message}"); }
+        }
+
+        private static void StartLoop(Ghost g, ClipGroup clip)
+        {
+            if (g.LoopAudio == null)
+            {
+                g.LoopAudio = g.Weapon.AddComponent<AudioSource>();
+                g.LoopAudio.loop = true;
+                g.LoopAudio.spatialBlend = 1f;
+                g.LoopAudio.minDistance = 3f;
+                g.LoopAudio.maxDistance = 35f;
+                g.LoopAudio.rolloffMode = AudioRolloffMode.Linear;
+                g.LoopAudio.playOnAwake = false;
+            }
+            if (!g.LoopAudio.isPlaying)
+            {
+                g.LoopAudio.clip = clip.RandomClip;
+                g.LoopAudio.outputAudioMixerGroup = clip.MixerGroup;
+                g.LoopAudio.volume = clip.Volume;
+                g.LoopAudio.Play();
+            }
+        }
+
+        /// <summary>Weapon back to idle when the remote stops shooting; stop loop sounds.</summary>
+        private static void TickWeapon(Ghost g)
+        {
+            if (g.WeaponFx == null || g.Weapon == null) return;
+            if (!g.Shooting && Time.time - g.LastFxTime > 0.5f)
+            {
+                if (g.WeaponFx.WeaponState != WeaponAnimator.WeaponStates.Idle) g.WeaponFx.WeaponState = WeaponAnimator.WeaponStates.Idle;
+                if (g.LoopAudio != null && g.LoopAudio.isPlaying) g.LoopAudio.Stop();
+            }
         }
 
         public static void SetDowned(CSteamID from, bool down)
@@ -235,6 +306,8 @@ namespace ZigguratMP.Sync
         {
             Ghost g = GetOrCreate(from);
 
+            if (!Finite(s.Position) || float.IsNaN(s.Yaw) || float.IsNaN(s.Pitch)) return; // corrupt / paused-frame snapshot
+            if (!Finite(s.Velocity)) s.Velocity = Vector3.zero;
             g.LastRecv = Time.unscaledTime;
             if (g.Buffer.Count > 0 && s.Time <= g.Buffer[g.Buffer.Count - 1].Time) return; // out of order
             if (g.Buffer.Count > 0 && s.Time - g.Buffer[g.Buffer.Count - 1].Time > 1f) g.ClockSynced = false; // gap (loading)
@@ -290,6 +363,8 @@ namespace ZigguratMP.Sync
                     g.BodyAnim.Dashing = (flags & PlayerStateMsg.FlagDashing) != 0;
                     g.BodyAnim.Shooting = (flags & PlayerStateMsg.FlagShooting) != 0;
                 }
+                g.Shooting = (flags & PlayerStateMsg.FlagShooting) != 0;
+                TickWeapon(g);
             }
         }
 
@@ -454,6 +529,9 @@ namespace ZigguratMP.Sync
         }
 
         public static int Count => ghosts.Count;
+
+        private static bool Finite(Vector3 v) =>
+            !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z) || float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
 
         public struct GhostView { public string Name; public Vector3 Position; public float Yaw; public bool Downed; }
 

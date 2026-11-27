@@ -44,7 +44,7 @@ namespace ZigguratMP.Net
 
     internal static class Protocol
     {
-        public const ushort Version = 7;
+        public const ushort Version = 8;
         public const int Channel = 0;
         public const string LobbyKeyMod = "zmp_mod";
         public const string LobbyKeyVersion = "zmp_ver";
