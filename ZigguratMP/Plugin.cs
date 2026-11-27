@@ -14,7 +14,7 @@ namespace ZigguratMP
     {
         public const string Guid = "com.zigguratmp.coop";
         public const string Name = "Ziggurat MP";
-        public const string Version = "0.8.0";
+        public const string Version = "0.8.1";
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -38,7 +38,7 @@ namespace ZigguratMP
             MenuKey = Config.Bind("General", "MenuKey", KeyCode.F8, "Toggle the multiplayer menu.");
             SendRateHz = Config.Bind("Network", "SendRateHz", 20, "Player state snapshots sent per second.");
             ShareKey = Config.Bind("General", "ShareKey", KeyCode.G, "Look at a weapon/amulet on the ground and press this to give it to the other players.");
-            TeleportToFights = Config.Bind("Coop", "TeleportToFights", true, "When a fight or the boss starts, players outside the room are teleported next to the player inside.");
+            TeleportToFights = Config.Bind("Coop", "GatherInFights", false, "When a fight or the boss starts, teleport you next to the player inside the room if you are outside. Off by default (also in F8 > Settings).");
             PortalCountdown = Config.Bind("Coop", "PortalCountdown", 30f, "Seconds the exit portal waits for the other players once someone is in it.");
             InterpDelay = Config.Bind("Network", "InterpDelay", 0.15f, "Seconds remote players are shown behind real time (higher = smoother, more delay).");
             EnemyHealthPerPlayer = Config.Bind("Difficulty", "EnemyHealthPerPlayer", 0.6f, "Host: extra enemy health per additional player (0.6 = +60%).");

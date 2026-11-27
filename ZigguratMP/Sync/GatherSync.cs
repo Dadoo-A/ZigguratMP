@@ -21,7 +21,9 @@ namespace ZigguratMP.Sync
         public static void OnLocalRoomEntered(RoomScript room) => LocalRoomId = room?.Room != null ? room.Room.Id : -1;
         public static void OnLocalRoomExit() => LocalRoomId = -1;
 
-        private static bool Enabled => Session.InLobby && Session.Members.Count > 1 && Plugin.TeleportToFights.Value && !StageParameters.IsTutorial;
+        private static bool InCoop => Session.InLobby && Session.Members.Count > 1 && !StageParameters.IsTutorial;
+        /// <summary>Each player opts in for being teleported (F8 > Settings); the host always announces.</summary>
+        private static bool Enabled => InCoop && Plugin.TeleportToFights.Value;
 
         // ------------------------------------------------------------------ host
 
@@ -30,13 +32,13 @@ namespace ZigguratMP.Sync
 
         public static void HostOnFightStarted(RoomScript room, Fight fight)
         {
-            if (!Session.IsHost || !Enabled || room?.Room == null || fight == null || fight.FightType == FightTypes.Boss) return;
+            if (!Session.IsHost || !InCoop || room?.Room == null || fight == null || fight.FightType == FightTypes.Boss) return;
             Broadcast(room, false);
         }
 
         public static void HostOnBossCutscene()
         {
-            if (!Session.IsHost || !Enabled) return;
+            if (!Session.IsHost || !InCoop) return;
             RoomScript room = LocalPlayerAccess.Logic?.CurrentRoom;
             if (room?.Room != null) Broadcast(room, true);
         }

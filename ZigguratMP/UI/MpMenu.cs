@@ -105,6 +105,9 @@ namespace ZigguratMP.UI
         {
             showSettings = GUILayout.Toggle(showSettings, "Settings");
             if (!showSettings) return;
+            Plugin.TeleportToFights.Value = GUILayout.Toggle(Plugin.TeleportToFights.Value, " Teleport me into fights / boss started by an ally");
+            GUILayout.Label($"Portal waits for the others: {Plugin.PortalCountdown.Value:0} s (host)");
+            Plugin.PortalCountdown.Value = Mathf.Round(GUILayout.HorizontalSlider(Plugin.PortalCountdown.Value, 5f, 120f));
             GUILayout.Label($"Send rate: {Plugin.SendRateHz.Value} Hz");
             Plugin.SendRateHz.Value = Mathf.RoundToInt(GUILayout.HorizontalSlider(Plugin.SendRateHz.Value, 10, 60));
             GUILayout.Label($"Smoothing delay: {Plugin.InterpDelay.Value * 1000f:0} ms");
