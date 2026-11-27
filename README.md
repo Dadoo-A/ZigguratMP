@@ -19,9 +19,32 @@ Unofficial online co-op for **Ziggurat 2** (Milkstone Studios), built as a [BepI
 
 ## Install
 
-1. Install **BepInEx 5.4.x (x64)** into the game folder (`steamapps/common/Ziggurat 2`) and run the game once.
-2. Copy `ZigguratMP.dll` to `BepInEx/plugins/ZigguratMP/`.
-3. Everyone in the group needs the **same mod version**; the lobby refuses mismatched versions.
+Every player in the group must do this, with the **same mod version**; the lobby refuses mismatched versions.
+
+### Prerequisites
+
+- **Ziggurat 2** on Steam (Windows). Co-op uses Steam lobbies and Steam P2P, so all players need Steam running.
+- **[BepInEx 5](https://github.com/BepInEx/BepInEx/releases), 64-bit Windows build**: the file named `BepInEx_win_x64_5.4.x.zip` (5.4.23 or newer).
+  - Do **not** use BepInEx 6 or the x86 build: the game is 64-bit Unity Mono, and the mod is built for BepInEx 5.
+
+### 1. Install BepInEx (once)
+
+1. Find the game folder: in Steam, right-click **Ziggurat 2**, then *Manage*, then *Browse local files*. It's usually `C:\Program Files (x86)\Steam\steamapps\common\Ziggurat 2`.
+2. Extract the contents of `BepInEx_win_x64_5.4.x.zip` **directly into that folder**, so that `winhttp.dll`, `doorstop_config.ini` and the `BepInEx` folder sit next to `Ziggurat2.exe`.
+3. Start the game once, go to the main menu, then quit. BepInEx creates its folders (`BepInEx/plugins`, `BepInEx/config`, `BepInEx/LogOutput.log`).
+   - If `BepInEx/LogOutput.log` doesn't exist afterwards, BepInEx isn't loading. Check that `winhttp.dll` is next to `Ziggurat2.exe`.
+
+### 2. Install the mod
+
+1. Download `ZigguratMP_vX.Y.Z.zip` from the [Releases](../../releases) page.
+2. Extract it into the same game folder. It only contains `BepInEx/plugins/ZigguratMP/ZigguratMP.dll`.
+3. Start the game. `BepInEx/LogOutput.log` should contain `Ziggurat MP X.Y.Z loaded`, and **F8** opens the multiplayer menu.
+
+### Update / uninstall
+
+- **Update:** extract the new release over the old one (it replaces `ZigguratMP.dll`).
+- **Remove the mod:** delete `BepInEx/plugins/ZigguratMP`.
+- **Remove all mods:** delete `winhttp.dll` (or the whole `BepInEx` folder, `winhttp.dll`, `doorstop_config.ini` and `.doorstop_version`).
 
 ## How to play
 
@@ -104,5 +127,5 @@ Bug reports are welcome: please attach `BepInEx/LogOutput.log` from **every** pl
 ## License
 
 The mod's source code is released under the [MIT License](LICENSE).
-The install zips on the Releases page also bundle [BepInEx](https://github.com/BepInEx/BepInEx) (LGPL-2.1), which keeps its own license.
+[BepInEx](https://github.com/BepInEx/BepInEx) is a separate prerequisite (not bundled) under its own license.
 Ziggurat 2 and all of its code and assets belong to Milkstone Studios and are not part of this project.
