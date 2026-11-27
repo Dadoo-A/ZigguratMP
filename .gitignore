@@ -1,0 +1,10 @@
+# Decompiled game code: Milkstone Studios property, local reference only. Never commit/publish.
+decompiled/
+
+bin/
+obj/
+*.user
+.vs/
+
+# Build artifacts / releases
+*.zip
