@@ -18,6 +18,8 @@ namespace ZigguratMP.Sync
     {
         /// <summary>Host: JSON of the run in progress (re-sent to late joiners). Client: run to start.</summary>
         public static string HostRunJson { get; private set; }
+        /// <summary>Client: the current/last run was the host's mission (campaign safety).</summary>
+        public static bool PlayedHostRun;
         private static string pendingStartJson;
         private static float pendingSince;
         private static int pendingStartLevel = 1;
@@ -31,6 +33,7 @@ namespace ZigguratMP.Sync
         public static void Reset()
         {
             HostRunJson = null;
+            PlayedHostRun = false;
             pendingStartJson = null;
             chosenLoadout = null;
             clearedLevel = -1;
@@ -295,6 +298,7 @@ namespace ZigguratMP.Sync
 
             MissionData mission = MissionData.FromJson(missionJson);
             clearedLevel = -1;
+            PlayedHostRun = true;
             Plugin.Log.LogInfo($"[client] Starting host run: mode {mode}, seed {mission.RandSeed}, character {mission.Character?.FullId}");
             LastInfo = $"Following host run, seed {mission.RandSeed}";
 

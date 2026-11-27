@@ -46,6 +46,7 @@ namespace ZigguratMP.Sync
                 if (p.Controller != null && p.Controller.IsDashing) f |= PlayerStateMsg.FlagDashing;
                 if (p.Controller != null && p.Controller.IsJumping) f |= PlayerStateMsg.FlagJumping;
                 if (p.CurrentWeapon != null && p.CurrentWeapon.IsShooting) f |= PlayerStateMsg.FlagShooting;
+                if (CoopPause.InMenu) f |= PlayerStateMsg.FlagInMenu;
                 state.Flags = f;
                 state.Health = (byte)Mathf.RoundToInt(Mathf.Clamp01(p.PlayerData.Health.Progress) * 255f);
             }

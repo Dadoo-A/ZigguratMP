@@ -49,6 +49,7 @@ namespace ZigguratMP.Sync
             public float LastFxTime;
             public AudioSource LoopAudio;
             public bool Shooting;
+            public bool InMenu;
         }
 
         private static readonly Dictionary<CSteamID, Ghost> ghosts = new Dictionary<CSteamID, Ghost>();
@@ -364,6 +365,7 @@ namespace ZigguratMP.Sync
                     g.BodyAnim.Shooting = (flags & PlayerStateMsg.FlagShooting) != 0;
                 }
                 g.Shooting = (flags & PlayerStateMsg.FlagShooting) != 0;
+                g.InMenu = (flags & PlayerStateMsg.FlagInMenu) != 0;
                 TickWeapon(g);
             }
         }
@@ -504,7 +506,8 @@ namespace ZigguratMP.Sync
                 if (sp.z <= 0f) continue;
                 UI.AllyHud.DrawHealthBar(new Vector2(sp.x, Screen.height - sp.y + 12f), g.Health, g.Downed);
                 var rect = new Rect(sp.x - 75f, Screen.height - sp.y - 12f, 150f, 24f);
-                GUI.Label(rect, g.Downed ? $"{g.Name}  [DOWN]" : g.Name, g.Downed ? Styles.DownTag : Styles.NameTag);
+                string tag = g.Downed ? $"{g.Name}  [DOWN]" : g.InMenu ? $"{g.Name}  [MENU]" : g.Name;
+                GUI.Label(rect, tag, g.Downed ? Styles.DownTag : Styles.NameTag);
             }
         }
 
@@ -534,6 +537,9 @@ namespace ZigguratMP.Sync
             !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z) || float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
 
         public struct GhostView { public string Name; public Vector3 Position; public float Yaw; public bool Downed; }
+
+        public static Vector3? GetPosition(CSteamID id) =>
+            ghosts.TryGetValue(id, out Ghost g) && g.Go != null && g.Go.activeSelf ? g.Go.transform.position : (Vector3?)null;
 
         public static IEnumerable<GhostView> VisibleGhosts()
         {

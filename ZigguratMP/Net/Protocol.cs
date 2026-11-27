@@ -32,6 +32,16 @@ namespace ZigguratMP.Net
         EnemyDie = 22,       // host -> all
         EnemyAttack = 23,    // host -> all: replay attack locally (bullets hit the local player)
         EnemyHurt = 24,      // client -> host: I hit enemy X for N damage
+        EnemyImpulse = 25,   // client -> host: push / knockback on enemy X
+        EnemyStatus = 26,    // client -> host: start status effect on enemy X (skills)
+
+        Gather = 60,         // host -> all: fight/boss started in room X, join near P
+        ObeliskHit = 61,     // client -> host: damage on the obelisk at P
+        ObeliskDead = 62,    // host -> all: obelisk at P destroyed
+        SequenceActivate = 63, // client -> host: activated the sequence item at P
+        SequenceStates = 64, // host -> all: sequence item states
+        ScavengePicked = 65, // client -> host: picked a scavenge item near P
+        PortalReady = 66,    // any -> all: I'm in the exit portal
 
         RoomEnter = 17,      // any -> all: I entered room X (map reveal; host starts the fight)
 
@@ -44,7 +54,7 @@ namespace ZigguratMP.Net
 
     internal static class Protocol
     {
-        public const ushort Version = 8;
+        public const ushort Version = 9;
         public const int Channel = 0;
         public const string LobbyKeyMod = "zmp_mod";
         public const string LobbyKeyVersion = "zmp_ver";
@@ -89,7 +99,7 @@ namespace ZigguratMP.Net
         public byte Flags;
         public byte Health; // 0..255 = health progress
 
-        public const byte FlagGrounded = 1, FlagDashing = 2, FlagJumping = 4, FlagShooting = 8;
+        public const byte FlagGrounded = 1, FlagDashing = 2, FlagJumping = 4, FlagShooting = 8, FlagInMenu = 16;
 
         public void Write(BinaryWriter w)
         {

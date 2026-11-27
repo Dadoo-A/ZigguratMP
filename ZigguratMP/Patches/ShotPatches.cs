@@ -79,6 +79,10 @@ namespace ZigguratMP.Patches
     [HarmonyPatch(typeof(RoomScript), nameof(RoomScript.PlayerEntered))]
     internal static class RoomPlayerEnteredPatch
     {
-        private static void Postfix(RoomScript __instance) => RoomSync.OnLocalRoomEntered(__instance);
+        private static void Postfix(RoomScript __instance)
+        {
+            GatherSync.OnLocalRoomEntered(__instance);
+            RoomSync.OnLocalRoomEntered(__instance);
+        }
     }
 }

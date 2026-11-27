@@ -14,6 +14,7 @@ Unofficial online co-op for **Ziggurat 2** (Milkstone Studios), built as a [BepI
 - **Remote players:** real 3D character models with walk/run animation, the equipped weapon in hand, aim, recoil, dash and jump poses. Shots, beams, muzzle effects and sounds are replayed visually, with no double damage.
 - **Downed and revive:** at 0 HP you go down instead of dying while an ally still stands. An ally who stays next to you for 3 seconds revives you; if everyone goes down, it's game over.
 - **Sharing:** XP and quest items (boss keys, secret keys) are shared, while chests and loot stay per player. Press **G** while looking at a weapon or amulet on the ground to give it to the others.
+- **Co-op rules for a single-player game:** menus (level-up perks, map, omens, pause) no longer stop time in co-op; you take half damage while in one, and others see [MENU] above you. Players outside a room are pulled in when its fight or the boss starts. The exit portal waits for everyone (or a countdown). Special fight objectives (obelisks, sequences, scavenge, overload) are shared.
 - **Difficulty scaling:** enemy and boss health grows with each extra player (configurable).
 - **HUD:** ally names with health bars, off-screen markers, allies on the minimap, and ping. Breakable props are synced.
 
@@ -54,7 +55,7 @@ Every player in the group must do this, with the **same mod version**; the lobby
    - **Settings:** network rate, smoothing, health scaling.
    - **Unstick:** emergency buttons if a fight or boss phase hangs.
 
-Config file: `BepInEx/config/com.zigguratmp.coop.cfg` (menu key, share key, network, difficulty).
+Config file: `BepInEx/config/com.zigguratmp.coop.cfg` (menu key, share key, network, difficulty, fight teleport, portal countdown).
 
 ## Building from source
 

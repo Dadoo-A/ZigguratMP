@@ -109,7 +109,12 @@ namespace ZigguratMP.Patches
         private static bool Prefix(Enemy __instance, DamageData damage, ref bool __result)
         {
             if (ShotSync.IsReplay(damage)) { __result = false; return false; } // remote shot replay: visual only
-            if (!NetEnemies.IsPuppet(__instance, out NetEnemy ne)) return true;
+            if (!NetEnemies.IsPuppet(__instance, out NetEnemy ne))
+            {
+                if (damage.DamageSource?.Character is Player) NetEnemies.HostNoteLocalHit(__instance);
+                return true;
+            }
+            if (damage.DamageSource != null && damage.DamageSource.Character is Player) ne.LastLocalSource = damage.DamageSource;
             if (damage.Team == Team.Enemy) { __result = false; return false; } // enemy friendly fire: host decides
 
             __result = __instance.IsAlive;

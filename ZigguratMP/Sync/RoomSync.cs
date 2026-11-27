@@ -18,6 +18,7 @@ namespace ZigguratMP.Sync
     internal static class RoomSync
     {
         private static readonly HashSet<int> pendingFights = new HashSet<int>();
+        private static readonly Dictionary<int, CSteamID> pendingBy = new Dictionary<int, CSteamID>();
         private static int pendingLevel = -1;
 
         public static void Reset()
@@ -58,6 +59,7 @@ namespace ZigguratMP.Sync
             {
                 if (pendingLevel != level) { pendingFights.Clear(); pendingLevel = level; }
                 pendingFights.Add(id);
+                pendingBy[id] = from;
             }
         }
 
@@ -75,7 +77,20 @@ namespace ZigguratMP.Sync
                 RoomScript room = FindRoom(logic, id);
                 if (room == null || room.RoomState != RoomScript.RoomStates.Idle) continue;
                 RoomType type = room.Room.Type;
-                if (type == RoomType.Boss) continue; // the boss cutscene stays the host's trigger
+                pendingBy.TryGetValue(id, out CSteamID by);
+                Vector3? anchor = RemotePlayers.GetPosition(by);
+
+                // Co-op gathering: the host joins the client inside the room, which starts the fight
+                // (or the boss intro) exactly as if the host had walked in.
+                bool combat = type == RoomType.Boss || type == RoomType.Gauntlet || type.IsCombatRoom();
+                if (combat && Plugin.TeleportToFights.Value && anchor.HasValue && GatherSync.LocalRoomId != id)
+                {
+                    GatherSync.PendingAnchor = anchor;
+                    if (GatherSync.TeleportInto(room, anchor.Value, $"client entered room {id}")) return;
+                    GatherSync.PendingAnchor = null;
+                }
+
+                if (type == RoomType.Boss) continue; // without gathering the boss intro stays the host's trigger
                 if (type == RoomType.Gauntlet)
                 {
                     Plugin.Log.LogInfo($"[host] Client entered gauntlet room {id}: starting it");
@@ -85,6 +100,7 @@ namespace ZigguratMP.Sync
                 if (type.IsCombatRoom())
                 {
                     Plugin.Log.LogInfo($"[host] Client entered room {id}: starting fight");
+                    GatherSync.PendingAnchor = anchor;
                     room.StartFight();
                     return;
                 }

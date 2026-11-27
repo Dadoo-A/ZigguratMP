@@ -18,6 +18,8 @@ namespace ZigguratMP.Sync
 
         public int Id;
         public bool IsPuppet;
+        /// <summary>Client: our last damage source on this puppet (kill credit / on-kill perks).</summary>
+        public IDamageSource LastLocalSource;
         public bool AllowDeath;
         public bool IsSpawnFlag;
 
@@ -156,10 +158,13 @@ namespace ZigguratMP.Sync
         {
             enemies.Remove(id);
             if (!Session.IsHost) return;
+            lastHitter.TryGetValue(id, out ulong killer);
+            lastHitter.Remove(id);
             BinaryWriter w = Session.Begin(MsgType.EnemyDie);
             w.Write(StageParameters.DungeonLevel);
             w.Write(id);
             w.Write((int)reason);
+            w.Write(killer);
             Session.SendBuiltToAll(true);
         }
 
@@ -248,8 +253,63 @@ namespace ZigguratMP.Sync
             if (level != StageParameters.DungeonLevel) return;
             if (!enemies.TryGetValue(id, out Enemy e) || e == null || !e.IsAlive) return;
 
-            var data = new DamageData(Team.Player, new ElementalDamage(nature, dmg, proc), duration, null, src);
+            var data = new DamageData(Team.Player, new ElementalDamage(nature, dmg, proc), duration, NetPlayerSource.For(from, src), src);
+            lastHitter[id] = from.m_SteamID;
             e.Hurt(data);
+        }
+
+        /// <summary>Host: who hit each enemy last (kill credit), by Steam id.</summary>
+        private static readonly Dictionary<int, ulong> lastHitter = new Dictionary<int, ulong>();
+
+        public static void HostNoteLocalHit(Enemy e)
+        {
+            if (!Session.IsHost || e == null) return;
+            NetEnemy ne = e.GetComponent<NetEnemy>();
+            if (ne != null) lastHitter[ne.Id] = Session.LocalId.m_SteamID;
+        }
+
+        // ---------------------------------------------------------------- client skill effects -> host
+
+        public static void ClientForwardImpulse(NetEnemy ne, Vector3 impulse, bool knockback)
+        {
+            BinaryWriter w = Session.Begin(MsgType.EnemyImpulse);
+            w.Write(StageParameters.DungeonLevel);
+            w.Write(ne.Id);
+            WriteVec(w, impulse);
+            w.Write(knockback);
+            Session.SendBuiltToHost(false);
+        }
+
+        public static void OnImpulseRequest(BinaryReader r)
+        {
+            int level = r.ReadInt32();
+            int id = r.ReadInt32();
+            Vector3 impulse = ReadVec(r);
+            bool knockback = r.ReadBoolean();
+            if (level != StageParameters.DungeonLevel || !enemies.TryGetValue(id, out Enemy e) || e == null || !e.IsAlive) return;
+            if (float.IsNaN(impulse.x) || impulse.sqrMagnitude > 1e6f) return;
+            e.ApplyImpulse(impulse, knockback);
+        }
+
+        public static bool ApplyingRemoteStatus;
+
+        public static void ClientForwardStatus(NetEnemy ne, EnemyStatusEffects fx)
+        {
+            BinaryWriter w = Session.Begin(MsgType.EnemyStatus);
+            w.Write(StageParameters.DungeonLevel);
+            w.Write(ne.Id);
+            w.Write((byte)fx);
+            Session.SendBuiltToHost(true);
+        }
+
+        public static void OnStatusRequest(CSteamID from, BinaryReader r)
+        {
+            int level = r.ReadInt32();
+            int id = r.ReadInt32();
+            var fx = (EnemyStatusEffects)r.ReadByte();
+            if (level != StageParameters.DungeonLevel || !enemies.TryGetValue(id, out Enemy e) || e == null || !e.IsAlive || e.Data == null) return;
+            if (fx >= EnemyStatusEffects.Count) return;
+            e.Data.StartStatusEffect(fx, NetPlayerSource.For(from, e.transform.position));
         }
 
         // =====================================================================
@@ -420,7 +480,7 @@ namespace ZigguratMP.Sync
                 {
                     bool want = (mask & (1 << i)) != 0, have = (local & (1 << i)) != 0;
                     var fx = (EnemyStatusEffects)i;
-                    if (want && !have) d.StartStatusEffect(fx, null);
+                    if (want && !have) { ApplyingRemoteStatus = true; try { d.StartStatusEffect(fx, null); } finally { ApplyingRemoteStatus = false; } }
                     else if (!want && have)
                     {
                         EndStatusMethod?.Invoke(d, new object[] { fx });
@@ -467,12 +527,20 @@ namespace ZigguratMP.Sync
             int level = r.ReadInt32();
             int id = r.ReadInt32();
             var reason = (DeathReason)r.ReadInt32();
+            ulong killer = r.ReadUInt64();
             if (level != floorLevel) return;
 
             if (enemies.TryGetValue(id, out Enemy e))
             {
                 if (e == null) { pendingDeaths.Add(id); return; } // still loading
-                KillPuppet(e, e.GetComponent<NetEnemy>(), reason);
+                NetEnemy kne = e.GetComponent<NetEnemy>();
+                // We landed the killing blow on the host: run our on-kill logic (weapon mastery, on-kill perks).
+                if (killer == Session.LocalId.m_SteamID && kne?.LastLocalSource != null)
+                {
+                    try { kne.LastLocalSource.DidKill(e); }
+                    catch (System.Exception ex) { Plugin.Log.LogDebug($"kill credit: {ex.Message}"); }
+                }
+                KillPuppet(e, kne, reason);
             }
             else pendingDeaths.Add(id);
         }

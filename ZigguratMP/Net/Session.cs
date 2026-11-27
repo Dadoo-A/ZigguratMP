@@ -114,6 +114,8 @@ namespace ZigguratMP.Net
             RoomSync.Tick();
             BossWatch.Tick();
             DownedSync.Tick(dt);
+            ObjectiveSync.Tick(dt);
+            PortalSync.Tick(dt);
             ReadyRoom.Tick();
             UI.AllyHud.Tick(dt);
         }
@@ -155,6 +157,8 @@ namespace ZigguratMP.Net
             ShotSync.Reset();
             RoomSync.Reset();
             DownedSync.Reset();
+            PortalSync.Reset();
+            GatherSync.Reset();
             ReadyRoom.Reset();
             UI.AllyHud.Reset();
             RemotePlayers.Clear();
@@ -433,6 +437,33 @@ namespace ZigguratMP.Net
                         break;
                     case MsgType.EnemyAttack when from == HostId:
                         NetEnemies.OnAttack(r);
+                        break;
+                    case MsgType.EnemyImpulse when IsHost:
+                        NetEnemies.OnImpulseRequest(r);
+                        break;
+                    case MsgType.EnemyStatus when IsHost:
+                        NetEnemies.OnStatusRequest(from, r);
+                        break;
+                    case MsgType.Gather when from == HostId:
+                        GatherSync.OnGather(r);
+                        break;
+                    case MsgType.ObeliskHit when IsHost:
+                        ObjectiveSync.OnObeliskHit(r);
+                        break;
+                    case MsgType.ObeliskDead when from == HostId:
+                        ObjectiveSync.OnObeliskDead(r);
+                        break;
+                    case MsgType.SequenceActivate when IsHost:
+                        ObjectiveSync.OnSequenceActivate(r);
+                        break;
+                    case MsgType.SequenceStates when from == HostId:
+                        ObjectiveSync.OnSequenceStates(r);
+                        break;
+                    case MsgType.ScavengePicked when IsHost:
+                        ObjectiveSync.OnScavengePicked(r);
+                        break;
+                    case MsgType.PortalReady:
+                        PortalSync.OnPortalReady(from, r);
                         break;
                     case MsgType.EnemyHurt when IsHost:
                         NetEnemies.OnHurtRequest(from, r);

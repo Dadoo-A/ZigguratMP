@@ -20,6 +20,7 @@ namespace ZigguratMP.Patches
         private static void Postfix(RoomScript room, Fight fight)
         {
             if (Session.IsClient) FightSync.ClientOnFightStarted(room, fight);
+            else GatherSync.HostOnFightStarted(room, fight);
         }
     }
 

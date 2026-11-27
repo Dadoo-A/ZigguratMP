@@ -4,7 +4,7 @@ Ziggurat 2 is a single-player, first-person roguelite. Players clear procedurall
 
 Many systems assume **one player who can stop time**. This roadmap lists what has to change for 2-4 players, ordered by how much it breaks a co-op run today.
 
-Legend: ✅ done · 🔶 partial · ⬜ to do
+Legend: ✅ done · 🔶 implemented or partial, needs testing · ⬜ to do
 
 ## Already in place (0.7.x)
 
@@ -23,7 +23,7 @@ Legend: ✅ done · 🔶 partial · ⬜ to do
 
 ## P0 — breaks or desyncs a run
 
-### 1. Time never stops in co-op ⬜
+### 1. Time never stops in co-op 🔶 *(0.8.0, needs testing)*
 The game sets `Time.timeScale = 0` for the pause menu, the **level-up perk screen**, the map, the **omen choice** and the character sheet (`StageScript.Pause(PauseReasons)`). In co-op:
 - **Host pausing** freezes every enemy for everyone.
 - **Client pausing** freezes only their own simulation, so their view drifts.
@@ -33,14 +33,14 @@ Plan:
 - Make a player in a menu harder to hit (damage reduction), and show "in menu" on their name tag.
 - Optional: a host-only "pause all" that freezes everyone together.
 
-### 2. Fight start and allies left outside ⬜
+### 2. Fight start and allies left outside 🔶 *(0.8.0, needs testing)*
 Starting a fight locks the room doors, so an ally still in the corridor is shut out (and on the host, `DungeonLogic` assumes the fight is in the host's current room).
 
 Plan:
 - When a fight starts, teleport allies who are outside into the room, near its entrance.
 - Or keep doors passable for allies; behaviour configurable.
 
-### 3. Boss room ⬜
+### 3. Boss room 🔶 *(0.8.0, needs testing)*
 Only the host can trigger the boss cutscene today.
 
 Plan:
@@ -48,7 +48,7 @@ Plan:
 - Everyone is teleported into the arena and sees the same cutscene.
 - The boss fight ends at the same time for all players.
 
-### 4. Special fight objectives (host-authoritative) ⬜
+### 4. Special fight objectives (host-authoritative) 🔶 *(0.8.0, needs testing)*
 Some fights have objectives that live in each player's copy of the world, so they currently desync:
 - **Obelisk:** break the obelisks (`Obelisk` is a damageable Character).
 - **Overload:** items to activate.
@@ -60,7 +60,7 @@ Plan:
 - Objectives belong to the host.
 - Client hits and interactions are forwarded to the host, and their state is mirrored to everyone.
 
-### 5. Floor exit / portal ⬜
+### 5. Floor exit / portal 🔶 *(0.8.0, needs testing)*
 Today the host's portal pulls everyone.
 
 Plan:
@@ -68,7 +68,7 @@ Plan:
 - The floor ends when **all standing players** are in the portal, or after a countdown started by the first one, with a "waiting for X" display.
 - The level-complete screen is synced.
 
-### 6. End of run and campaign progress ⬜
+### 6. End of run and campaign progress 🔶 *(0.8.0, needs testing)*
 Each player saves their own campaign; a client runs the host's mission inside their own save.
 
 Plan:
@@ -76,7 +76,7 @@ Plan:
 - Each player gets their own mission rewards in their own save.
 - Missions the client doesn't own (story missions) must not break or skip the client's own campaign.
 
-### 7. Client combat effects applied on the host 🔶
+### 7. Client combat effects applied on the host 🔶 *(0.8.0, needs testing)*
 Client damage reaches the host; still to check or forward:
 - elemental procs (burn, freeze…) caused by client weapons;
 - knockback and pushes (Apprentice 2 skill), slows;
