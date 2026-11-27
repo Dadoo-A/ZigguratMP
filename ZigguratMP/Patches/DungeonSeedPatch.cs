@@ -31,13 +31,13 @@ namespace ZigguratMP.Patches
     [HarmonyPatch(typeof(CampaignData), nameof(CampaignData.LoadMission))]
     internal static class CampaignStartPatch
     {
-        private static void Postfix() { if (!ReadyRoom.HostWaiting) RunSync.OnHostRunStarted(); }
+        private static void Postfix() { if (!ReadyRoom.HostWaiting) { BalanceSync.OnAnyRunStarted(); RunSync.OnHostRunStarted(); } }
     }
 
     /// <summary>Host starts an extra-mode run (classic / endless / daily / gauntlet).</summary>
     [HarmonyPatch(typeof(ExtraModesData), nameof(ExtraModesData.LoadGame))]
     internal static class ExtraModesStartPatch
     {
-        private static void Postfix() { if (!ReadyRoom.HostWaiting) RunSync.OnHostRunStarted(); }
+        private static void Postfix() { if (!ReadyRoom.HostWaiting) { BalanceSync.OnAnyRunStarted(); RunSync.OnHostRunStarted(); } }
     }
 }

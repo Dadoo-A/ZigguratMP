@@ -10,7 +10,8 @@ namespace ZigguratMP.Net
         Welcome = 2,      // host -> client: accepted
         StartRun = 3,     // host -> all: StageParameters JSON (mission, mode, difficulty, level)
         FloorInfo = 4,
-        CharacterPick = 5, // any -> all: I picked character X in the briefing (ready)    // host -> all: dungeon builder inputs for one floor
+        CharacterPick = 5, // any -> all: I picked character X in the briefing (ready)
+        HostBriefing = 6,  // host -> all: host opened this mission briefing / extra mode select    // host -> all: dungeon builder inputs for one floor
         PlayerState = 10, // any -> all: transform snapshot (unreliable)
         PlayerInfo = 11,  // any -> all: character FullId (for the 3D body)
         PlayerDowned = 12, // any -> all: I'm down / back up
@@ -34,6 +35,9 @@ namespace ZigguratMP.Net
         EnemyHurt = 24,      // client -> host: I hit enemy X for N damage
         EnemyImpulse = 25,   // client -> host: push / knockback on enemy X
         EnemyStatus = 26,    // client -> host: start status effect on enemy X (skills)
+        SummonSpawn = 27,    // owner -> all: my player-team summon appeared
+        SummonSnaps = 28,    // owner -> all (unreliable): summon positions
+        SummonDie = 29,      // owner -> all
 
         Gather = 60,         // host -> all: fight/boss started in room X, join near P
         ObeliskHit = 61,     // client -> host: damage on the obelisk at P
@@ -42,6 +46,8 @@ namespace ZigguratMP.Net
         SequenceStates = 64, // host -> all: sequence item states
         ScavengePicked = 65, // client -> host: picked a scavenge item near P
         PortalReady = 66,    // any -> all: I'm in the exit portal
+        EconomyUsed = 67,    // any -> all: used a fountain / shrine / shop item (shared economy)
+        EnemyModifier = 68,  // any -> all: omen modifier that changes enemies
 
         RoomEnter = 17,      // any -> all: I entered room X (map reveal; host starts the fight)
 
@@ -50,11 +56,13 @@ namespace ZigguratMP.Net
         BeamStart = 42,      // any -> all: beam id + definition
         BeamUpdate = 43,     // any -> all (unreliable): beam transform
         BeamEnd = 44,        // any -> all
+        TurretSpawn = 45,    // any -> all: amulet turret placed (visual copy)
+        ExplosionFx = 46,    // any -> all: skill / amulet explosion (visual replay)
     }
 
     internal static class Protocol
     {
-        public const ushort Version = 9;
+        public const ushort Version = 10;
         public const int Channel = 0;
         public const string LobbyKeyMod = "zmp_mod";
         public const string LobbyKeyVersion = "zmp_ver";

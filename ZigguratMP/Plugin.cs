@@ -14,7 +14,7 @@ namespace ZigguratMP
     {
         public const string Guid = "com.zigguratmp.coop";
         public const string Name = "Ziggurat MP";
-        public const string Version = "0.8.1";
+        public const string Version = "0.9.0";
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -24,6 +24,9 @@ namespace ZigguratMP
         internal static ConfigEntry<KeyCode> ShareKey;
         internal static ConfigEntry<bool> TeleportToFights;
         internal static ConfigEntry<float> PortalCountdown;
+        internal static ConfigEntry<float> EnemyCountPerPlayer;
+        internal static ConfigEntry<float> ChampionChancePerPlayer;
+        internal static ConfigEntry<bool> SharedEconomy;
         internal static ConfigEntry<float> InterpDelay;
         internal static ConfigEntry<float> EnemyHealthPerPlayer;
         internal static ConfigEntry<float> BossHealthPerPlayer;
@@ -40,6 +43,9 @@ namespace ZigguratMP
             ShareKey = Config.Bind("General", "ShareKey", KeyCode.G, "Look at a weapon/amulet on the ground and press this to give it to the other players.");
             TeleportToFights = Config.Bind("Coop", "GatherInFights", false, "When a fight or the boss starts, teleport you next to the player inside the room if you are outside. Off by default (also in F8 > Settings).");
             PortalCountdown = Config.Bind("Coop", "PortalCountdown", 30f, "Seconds the exit portal waits for the other players once someone is in it.");
+            EnemyCountPerPlayer = Config.Bind("Difficulty", "EnemyCountPerPlayer", 0.35f, "Host: extra fight threat (more / tougher waves) per additional player (0.35 = +35%).");
+            ChampionChancePerPlayer = Config.Bind("Difficulty", "ChampionChancePerPlayer", 0.25f, "Host: extra champion chance per additional player.");
+            SharedEconomy = Config.Bind("Coop", "SharedEconomy", false, "Host: fountains, shrines and shop items are used up for everyone when one player uses them (off = each player has their own).");
             InterpDelay = Config.Bind("Network", "InterpDelay", 0.15f, "Seconds remote players are shown behind real time (higher = smoother, more delay).");
             EnemyHealthPerPlayer = Config.Bind("Difficulty", "EnemyHealthPerPlayer", 0.6f, "Host: extra enemy health per additional player (0.6 = +60%).");
             BossHealthPerPlayer = Config.Bind("Difficulty", "BossHealthPerPlayer", 0.75f, "Host: extra boss health per additional player.");

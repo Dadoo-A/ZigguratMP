@@ -170,13 +170,14 @@ namespace ZigguratMP.Sync
         private static readonly HarmonyLib.AccessTools.FieldRef<WeaponAnimator, Animator> WeaponAnimatorRef =
             HarmonyLib.AccessTools.FieldRefAccess<WeaponAnimator, Animator>("weaponAnimator");
 
-        public const byte FxShoot = 0, FxCharge = 1, FxCooldown = 2;
+        public const byte FxShoot = 0, FxCharge = 1, FxCooldown = 2, FxSkill = 3;
 
         /// <summary>Remote weapon event: shoot (muzzle fx, sound, recoil), charge, or cooldown.</summary>
         public static void OnRemoteFire(CSteamID from, int attackIndex, byte kind)
         {
             if (!ghosts.TryGetValue(from, out Ghost g) || g.Go == null || !g.Go.activeSelf) return;
-            if (kind == FxShoot) g.BodyAnim?.Fire();
+            if (kind == FxShoot || kind == FxSkill) g.BodyAnim?.Fire();
+            if (kind == FxSkill) return; // cast gesture only; the skill's effects are replayed separately
             WeaponAnimator wa = g.WeaponFx;
             if (wa == null || g.Weapon == null || !g.Weapon.activeInHierarchy) return;
             WeaponAnimator.AttackEffects fx = attackIndex <= 0 ? wa.MainAttack : wa.SecondaryAttack;

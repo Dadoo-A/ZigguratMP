@@ -18,6 +18,8 @@ namespace ZigguratMP.Sync
 
         public int Id;
         public bool IsPuppet;
+        /// <summary>Copy of another player's summon (puppet on host and clients alike).</summary>
+        public bool IsSummonReplica;
         /// <summary>Client: our last damage source on this puppet (kill credit / on-kill perks).</summary>
         public IDamageSource LastLocalSource;
         public bool AllowDeath;
@@ -102,9 +104,9 @@ namespace ZigguratMP.Sync
         public static bool IsPuppet(Enemy e, out NetEnemy ne)
         {
             ne = null;
-            if (!Session.IsClient || e == null) return false;
+            if (e == null || !Session.InLobby) return false;
             ne = e.GetComponent<NetEnemy>();
-            return ne != null && ne.IsPuppet;
+            return ne != null && ne.IsPuppet && (Session.IsClient || ne.IsSummonReplica);
         }
 
         // =====================================================================

@@ -85,34 +85,34 @@ Client damage reaches the host; still to check or forward:
 
 ## P1 — fairness and balance
 
-### 8. Player-team entities ⬜
+### 8. Player-team entities 🔶 *(0.9.0, needs testing)*
 These exist only on the owner's side today:
 - **Necromancer** minions (spawned directly, outside `SpawnEnemy`);
 - turrets (`TurretAmulet`, projectile turrets) and other summons.
 
 Plan: replicate them as visual puppets, and make the host's enemies target and fight them.
 
-### 9. Skills and amulets visuals ⬜
+### 9. Skills and amulets visuals 🔶 *(0.9.0, needs testing)*
 Remote players' active skills, amulet activations and their area effects should be visible: replay the visual effect, but apply its game effect only on the authority side (as for shots).
 
-### 10. Run modifiers and omens ⬜
+### 10. Run modifiers and omens 🔶 *(0.9.0, needs testing)*
 Run modifiers chosen at omen shrines, and campaign run modifiers, can change **enemies**. Those must come from the host for everyone.
 
 Player-side modifiers stay personal. Decide per modifier tag (`RunModifierTags`).
 
-### 11. Difficulty scaling 🔶
+### 11. Difficulty scaling 🔶 *(0.9.0, needs testing)*
 Enemy and boss health scale with player count. Still to do:
 - optional extra enemies per wave;
 - champion chance;
 - per-mode presets;
 - check that shared XP doesn't speed up leveling too much.
 
-### 12. Economy decisions ⬜
+### 12. Economy decisions 🔶 *(0.9.0, needs testing)*
 Shops, shrines, fountains and the forge are per player (each player has their own copy of every room). Make this an explicit host setting:
 - **per player:** current behaviour, generous;
 - **shared:** using a fountain or shrine consumes it for everyone; shop stock is shared.
 
-### 13. Leaderboards and Daily ⬜
+### 13. Leaderboards and Daily 🔶 *(0.9.0, needs testing)*
 Disable leaderboard submission for co-op runs (Daily, Endless, Classic), or tag them as co-op, so solo leaderboards stay fair.
 
 ## P2 — game modes

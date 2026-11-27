@@ -116,6 +116,8 @@ namespace ZigguratMP.Net
             DownedSync.Tick(dt);
             ObjectiveSync.Tick(dt);
             PortalSync.Tick(dt);
+            BalanceSync.Tick();
+            SummonSync.Tick(dt);
             ReadyRoom.Tick();
             UI.AllyHud.Tick(dt);
         }
@@ -158,6 +160,8 @@ namespace ZigguratMP.Net
             RoomSync.Reset();
             DownedSync.Reset();
             PortalSync.Reset();
+            BalanceSync.Reset();
+            SummonSync.Reset();
             GatherSync.Reset();
             ReadyRoom.Reset();
             UI.AllyHud.Reset();
@@ -461,6 +465,30 @@ namespace ZigguratMP.Net
                         break;
                     case MsgType.ScavengePicked when IsHost:
                         ObjectiveSync.OnScavengePicked(r);
+                        break;
+                    case MsgType.HostBriefing when from == HostId:
+                        ReadyRoom.OnHostBriefing(r);
+                        break;
+                    case MsgType.SummonSpawn:
+                        SummonSync.OnSummonSpawn(from, r);
+                        break;
+                    case MsgType.SummonSnaps:
+                        SummonSync.OnSummonSnaps(from, r);
+                        break;
+                    case MsgType.SummonDie:
+                        SummonSync.OnSummonDie(from, r);
+                        break;
+                    case MsgType.TurretSpawn:
+                        SummonSync.OnTurretSpawn(from, r);
+                        break;
+                    case MsgType.ExplosionFx:
+                        SummonSync.OnExplosionFx(from, r);
+                        break;
+                    case MsgType.EconomyUsed:
+                        BalanceSync.OnEconomyUsed(from, r);
+                        break;
+                    case MsgType.EnemyModifier:
+                        BalanceSync.OnEnemyModifier(from, r);
                         break;
                     case MsgType.PortalReady:
                         PortalSync.OnPortalReady(from, r);

@@ -7,7 +7,7 @@ Unofficial online co-op for **Ziggurat 2** (Milkstone Studios), built as a [BepI
 ## Features
 
 - **Lobby:** host from the F8 menu, invite through Steam, or join a friend's lobby from F8.
-- **Character select together:** everyone picks character and weapons on the game's own briefing screen. Each pick is shown to all players, and the run starts once everyone has picked.
+- **Character select together:** when the host opens a mission briefing, the same screen opens for every client. Everyone picks character and weapons there, each pick is shown to all players, and the run starts once everyone has picked.
 - **Same world:** identical run and floors (mission seed plus per-floor generator inputs from the host), shared map exploration, and floor transitions follow the host. Late joiners catch up floor by floor.
 - **Host-authoritative enemies:** the host runs the AI. Clients see synced puppets: position, health, status effects (burn, freeze…), boss phases and shields, and replayed attacks.
 - **Combat for everyone:** enemies target every player. Client damage is sent to the host. Any player entering a combat room starts the fight.
@@ -15,7 +15,9 @@ Unofficial online co-op for **Ziggurat 2** (Milkstone Studios), built as a [BepI
 - **Downed and revive:** at 0 HP you go down instead of dying while an ally still stands. An ally who stays next to you for 3 seconds revives you; if everyone goes down, it's game over.
 - **Sharing:** XP and quest items (boss keys, secret keys) are shared, while chests and loot stay per player. Press **G** while looking at a weapon or amulet on the ground to give it to the others.
 - **Co-op rules for a single-player game:** menus (level-up perks, map, omens, pause) no longer stop time in co-op; you take half damage while in one, and others see [MENU] above you. Optionally (F8 > Settings, off by default), players outside a room are teleported in when its fight or the boss starts. The exit portal waits for everyone (or a countdown). Special fight objectives (obelisks, sequences, scavenge, overload) are shared.
-- **Difficulty scaling:** enemy and boss health grows with each extra player (configurable).
+- **Difficulty scaling:** each extra player adds enemy and boss health, bigger waves and more champions (all configurable by the host).
+- **Allies' summons and skills:** Necromancer minions and other player-team summons are visible to everyone and enemies can target them. Amulet turrets and skill explosions are shown too, and omens that change enemies apply for everyone.
+- **Economy:** per player by default; the host can make fountains, shrines and the shop shared. Co-op runs are never sent to leaderboards.
 - **HUD:** ally names with health bars, off-screen markers, allies on the minimap, and ping. Breakable props are synced.
 
 ## Install
@@ -50,9 +52,9 @@ Every player in the group must do this, with the **same mod version**; the lobby
 ## How to play
 
 1. Host: press **F8**, then *Host co-op lobby*, then *Invite friends*. Friends accept the Steam invite, or use *Join <friend>* in their own F8 menu.
-2. Everyone opens a mission briefing, picks a character and weapons, and presses **Start**. The run launches when all players are ready; the host can force it from F8.
+2. The host opens a mission briefing; the same briefing opens automatically for the clients. Everyone picks a character and weapons and presses **Start**. The run launches when all players are ready; the host can force it from F8.
 3. Useful F8 options:
-   - **Settings:** teleport into allies' fights, portal wait time, network rate, smoothing, health scaling.
+   - **Settings:** teleport into allies' fights, portal wait time, shared economy, difficulty scaling, network rate, smoothing.
    - **Unstick:** emergency buttons if a fight or boss phase hangs.
 
 Config file: `BepInEx/config/com.zigguratmp.coop.cfg` (menu key, share key, network, difficulty, fight teleport, portal countdown).

@@ -64,7 +64,8 @@ namespace ZigguratMP.UI
             }
             GUILayout.Label($"Ghosts: {RemotePlayers.Count}   Net enemies: {NetEnemies.Count}");
             GUILayout.Label($"Fight: {FightSync.LastInfo}");
-            if (Session.IsHost) GUILayout.Label(NetEnemies.ScalingInfo);
+            if (Session.IsHost) GUILayout.Label($"{NetEnemies.ScalingInfo}, {BalanceSync.DifficultyInfo}");
+            GUILayout.Label($"Economy: {(BalanceSync.SharedEconomy ? "shared" : "per player")}");
 
             if (Session.IsClient)
             {
@@ -112,6 +113,12 @@ namespace ZigguratMP.UI
             Plugin.SendRateHz.Value = Mathf.RoundToInt(GUILayout.HorizontalSlider(Plugin.SendRateHz.Value, 10, 60));
             GUILayout.Label($"Smoothing delay: {Plugin.InterpDelay.Value * 1000f:0} ms");
             Plugin.InterpDelay.Value = Mathf.Round(GUILayout.HorizontalSlider(Plugin.InterpDelay.Value, 0.05f, 0.4f) * 100f) / 100f;
+            GUILayout.Label("— Host —");
+            Plugin.SharedEconomy.Value = GUILayout.Toggle(Plugin.SharedEconomy.Value, " Shared fountains / shrines / shop (off = each player has their own)");
+            GUILayout.Label($"Enemy waves per extra player: +{Plugin.EnemyCountPerPlayer.Value * 100f:0}%");
+            Plugin.EnemyCountPerPlayer.Value = Mathf.Round(GUILayout.HorizontalSlider(Plugin.EnemyCountPerPlayer.Value, 0f, 1.5f) * 20f) / 20f;
+            GUILayout.Label($"Champion chance per extra player: +{Plugin.ChampionChancePerPlayer.Value * 100f:0}%");
+            Plugin.ChampionChancePerPlayer.Value = Mathf.Round(GUILayout.HorizontalSlider(Plugin.ChampionChancePerPlayer.Value, 0f, 1.5f) * 20f) / 20f;
             GUILayout.Label($"Enemy HP per extra player: +{Plugin.EnemyHealthPerPlayer.Value * 100f:0}% (host)");
             Plugin.EnemyHealthPerPlayer.Value = Mathf.Round(GUILayout.HorizontalSlider(Plugin.EnemyHealthPerPlayer.Value, 0f, 1.5f) * 20f) / 20f;
             GUILayout.Label($"Boss HP per extra player: +{Plugin.BossHealthPerPlayer.Value * 100f:0}% (host)");
