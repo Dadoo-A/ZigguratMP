@@ -100,3 +100,9 @@ ZigguratMP/
 - [ ] Installer / auto-update
 
 Bug reports are welcome: please attach `BepInEx/LogOutput.log` from **every** player.
+
+## License
+
+The mod's source code is released under the [MIT License](LICENSE).
+The install zips on the Releases page also bundle [BepInEx](https://github.com/BepInEx/BepInEx) (LGPL-2.1), which keeps its own license.
+Ziggurat 2 and all of its code and assets belong to Milkstone Studios and are not part of this project.
