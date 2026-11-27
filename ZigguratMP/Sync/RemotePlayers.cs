@@ -429,7 +429,7 @@ namespace ZigguratMP.Sync
                 if (sp.z <= 0f) continue;
                 UI.AllyHud.DrawHealthBar(new Vector2(sp.x, Screen.height - sp.y + 12f), g.Health, g.Downed);
                 var rect = new Rect(sp.x - 75f, Screen.height - sp.y - 12f, 150f, 24f);
-                GUI.Label(rect, g.Downed ? $"{g.Name}  [À TERRE]" : g.Name, g.Downed ? Styles.DownTag : Styles.NameTag);
+                GUI.Label(rect, g.Downed ? $"{g.Name}  [DOWN]" : g.Name, g.Downed ? Styles.DownTag : Styles.NameTag);
             }
         }
 

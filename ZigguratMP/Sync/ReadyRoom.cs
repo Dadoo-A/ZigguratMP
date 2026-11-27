@@ -131,17 +131,17 @@ namespace ZigguratMP.Sync
                 string name = SteamFriends.GetFriendPersonaName(m) + (m == Session.HostId ? " (host)" : "");
                 lines.AppendLine(picks.TryGetValue(m, out string ch)
                     ? $"<color=#7CFC7C>✔</color>  {name} — <b>{NameOf(ch)}</b>"
-                    : $"<color=#FFB347>…</color>  {name} — en train de choisir");
+                    : $"<color=#FFB347>…</color>  {name} — choosing...");
             }
             bool iPicked = picks.ContainsKey(Session.LocalId);
             string hint = iPicked
-                ? (Session.IsHost ? "La partie se lance quand tout le monde a choisi (F8 : lancer sans attendre)." : "Prêt. La partie se lance quand l'host a choisi.")
-                : "Ouvre une mission, choisis ton perso et tes armes, puis Start.";
+                ? (Session.IsHost ? "The run starts once everyone has picked (F8: start without waiting)." : "Ready. The run starts once the host has picked.")
+                : "Open a mission, pick your character and weapons, then press Start.";
 
             float w = 480f, h = 90f + 24f * Session.Members.Count;
             var r = new Rect((Screen.width - w) * 0.5f, 20f, w, h);
             GUI.Box(r, GUIContent.none, box);
-            GUI.Label(new Rect(r.x + 12, r.y + 6, w - 24, 26), "Co-op : choix des personnages", title);
+            GUI.Label(new Rect(r.x + 12, r.y + 6, w - 24, 26), "Co-op: character select", title);
             GUI.Label(new Rect(r.x + 12, r.y + 34, w - 24, h - 40), lines + "<i>" + hint + "</i>", text);
         }
     }

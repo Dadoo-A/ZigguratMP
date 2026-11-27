@@ -23,15 +23,15 @@ namespace ZigguratMP.Sync
             PlayerInteractable target = p.CurrentInteractable;
             JObject json = null;
             string label = null;
-            if (target is WeaponPickupScript w) { json = w.ToJson(); label = "arme"; }
-            else if (target is AmuletPickupScript a) { json = a.ToJson(); label = "amulette"; }
-            if (json == null) { Show("Regarde une arme ou une amulette au sol pour la partager"); return; }
+            if (target is WeaponPickupScript w) { json = w.ToJson(); label = "Weapon"; }
+            else if (target is AmuletPickupScript a) { json = a.ToJson(); label = "Amulet"; }
+            if (json == null) { Show("Look at a weapon or amulet on the ground to share it"); return; }
 
             Session.Begin(MsgType.ItemShare).Write(json.ToString(Formatting.None));
             Session.SendBuiltToAll(true);
             Object.Destroy(target.gameObject);
             Plugin.Log.LogInfo($"[share] Gave {json["id"]} to the other players");
-            Show($"{label} partagée");
+            Show($"{label} shared");
         }
 
         public static void OnItemShare(CSteamID from, BinaryReader r)
@@ -51,7 +51,7 @@ namespace ZigguratMP.Sync
                 else return;
                 string who = SteamFriends.GetFriendPersonaName(from);
                 Plugin.Log.LogInfo($"[share] {who} shared {json["id"]}");
-                Show($"{who} t'a partagé un objet");
+                Show($"{who} shared an item with you");
             }
             catch (System.Exception e) { Plugin.Log.LogWarning($"[share] Could not spawn shared item: {e.Message}"); }
         }

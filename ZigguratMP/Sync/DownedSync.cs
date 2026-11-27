@@ -209,12 +209,12 @@ namespace ZigguratMP.Sync
 
             if (LocalDowned)
             {
-                GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, 40), "À TERRE — un allié doit rester près de toi pour te relever", big);
+                GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, 40), "DOWN — an ally must stay next to you to revive you", big);
             }
             else if (revivingName != null)
             {
                 float w = 300f, x = (Screen.width - w) * 0.5f, y = Screen.height * 0.6f;
-                GUI.Label(new Rect(0, y - 40, Screen.width, 36), $"Réanimation de {revivingName}...", big);
+                GUI.Label(new Rect(0, y - 40, Screen.width, 36), $"Reviving {revivingName}...", big);
                 GUI.Box(new Rect(x, y, w, 18), GUIContent.none);
                 GUI.Box(new Rect(x, y, w * Mathf.Clamp01(revivingProgress), 18), GUIContent.none);
             }
