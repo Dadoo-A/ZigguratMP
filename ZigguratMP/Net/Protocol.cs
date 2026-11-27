@@ -21,6 +21,7 @@ namespace ZigguratMP.Net
         ItemShare = 19,    // any -> all: pickup JSON given to the others
         Ping = 50,         // any -> all
         Pong = 51,         // reply to Ping
+        Ping3D = 52,       // any -> all: "look here" marker
 
         XpShare = 30,     // any -> all: I earned N XP, you get it too
         KeyShare = 31,    // any -> all: I picked up a key at P
@@ -48,6 +49,7 @@ namespace ZigguratMP.Net
         PortalReady = 66,    // any -> all: I'm in the exit portal
         EconomyUsed = 67,    // any -> all: used a fountain / shrine / shop item (shared economy)
         EnemyModifier = 68,  // any -> all: omen modifier that changes enemies
+        RoomStateRequest = 69, // client -> host: send me this floor's visited / cleared rooms
 
         RoomEnter = 17,      // any -> all: I entered room X (map reveal; host starts the fight)
 
@@ -62,7 +64,7 @@ namespace ZigguratMP.Net
 
     internal static class Protocol
     {
-        public const ushort Version = 10;
+        public const ushort Version = 11;
         public const int Channel = 0;
         public const string LobbyKeyMod = "zmp_mod";
         public const string LobbyKeyVersion = "zmp_ver";

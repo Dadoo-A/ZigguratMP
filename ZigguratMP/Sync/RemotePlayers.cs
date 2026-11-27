@@ -50,6 +50,7 @@ namespace ZigguratMP.Sync
             public AudioSource LoopAudio;
             public bool Shooting;
             public bool InMenu;
+            public bool ForearmWeapon;
         }
 
         private static readonly Dictionary<CSteamID, Ghost> ghosts = new Dictionary<CSteamID, Ghost>();
@@ -161,9 +162,22 @@ namespace ZigguratMP.Sync
             g.Audio.rolloffMode = AudioRolloffMode.Linear;
             g.Audio.playOnAwake = false;
 
-            g.BodyAnim?.AttachWeapon(w.transform, g.Muzzle);
+            g.ForearmWeapon = IsForearmWeapon(g.WeaponId);
+            g.BodyAnim?.AttachWeapon(w.transform, g.Muzzle, g.ForearmWeapon);
             if (g.Body == null) w.SetActive(false);
             Plugin.Log.LogInfo($"[weapon {g.Name}] {g.WeaponId} size={size:0.00} muzzle={(g.Muzzle != null ? g.Muzzle.name : "none")}");
+        }
+
+        private static bool IsForearmWeapon(string weaponId)
+        {
+            if (string.IsNullOrEmpty(weaponId)) return false;
+            string id = weaponId.ToLowerInvariant();
+            foreach (string k in Plugin.ForearmWeapons.Value.Split(','))
+            {
+                string key = k.Trim().ToLowerInvariant();
+                if (key.Length > 0 && id.Contains(key)) return true;
+            }
+            return false;
         }
 
         /// <summary>Remote player fired attack <paramref name="attackIndex"/>: muzzle fx, sound, recoil.</summary>
@@ -279,7 +293,7 @@ namespace ZigguratMP.Sync
                 if (g.Weapon != null)
                 {
                     g.Weapon.SetActive(true);
-                    g.BodyAnim.AttachWeapon(g.Weapon.transform, g.Muzzle);
+                    g.BodyAnim.AttachWeapon(g.Weapon.transform, g.Muzzle, g.ForearmWeapon);
                 }
                 Plugin.Log.LogInfo($"Loaded body {wanted} for {g.Name}");
             });

@@ -19,6 +19,11 @@ Unofficial online co-op for **Ziggurat 2** (Milkstone Studios), built as a [BepI
 - **Allies' summons and skills:** Necromancer minions and other player-team summons are visible to everyone and enemies can target them. Amulet turrets and skill explosions are shown too, and omens that change enemies apply for everyone.
 - **Economy:** per player by default; the host can make fountains, shrines and the shop shared. Co-op runs are never sent to leaderboards.
 - **HUD:** ally names with health bars, off-screen markers, allies on the minimap, and ping. Breakable props are synced.
+- **Quality of life:**
+  - **Ping marker:** middle click marks the spot or enemy you look at.
+  - **Downed spectator camera:** follow an ally while you wait for a revive.
+  - **Late joiners** start next to the host on the current floor.
+  - **Host leaving:** if the host leaves mid-run, the others keep playing solo.
 
 ## Install
 
@@ -57,7 +62,7 @@ Every player in the group must do this, with the **same mod version**; the lobby
    - **Settings:** teleport into allies' fights, portal wait time, shared economy, difficulty scaling, network rate, smoothing.
    - **Unstick:** emergency buttons if a fight or boss phase hangs.
 
-Config file: `BepInEx/config/com.zigguratmp.coop.cfg` (menu key, share key, network, difficulty, fight teleport, portal countdown).
+Config file: `BepInEx/config/com.zigguratmp.coop.cfg` (menu / share / ping / spectate keys, network, difficulty, fight teleport, portal countdown, forearm weapons).
 
 ## Building from source
 

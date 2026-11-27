@@ -192,9 +192,12 @@ namespace ZigguratMP.Sync
         // ---------------------------------------------------------------- weapon
 
         /// <summary>Holds <paramref name="w"/> in front of the body; muzzle defines its forward.</summary>
-        public void AttachWeapon(Transform w, Transform muzzle)
+        private bool forearmMount;
+
+        public void AttachWeapon(Transform w, Transform muzzle, bool onForearm = false)
         {
             weapon = w;
+            forearmMount = onForearm;
             weaponAlign = Quaternion.identity;
             if (w == null) return;
             if (muzzle != null && muzzle != w)
@@ -365,6 +368,17 @@ namespace ZigguratMP.Sync
                 Reach(rArm, rHand.position, grip);
             }
             EndBone(rArm); EndBone(rForearm);
+
+            if (forearmMount)
+            {
+                // Gauntlet-like weapons: worn along the forearm, pointing where the arm points.
+                Vector3 along = rHand.position - rForearm.position;
+                if (along.sqrMagnitude > 1e-6f)
+                {
+                    weapon.position = Vector3.Lerp(rForearm.position, rHand.position, 0.6f);
+                    weapon.rotation = Quaternion.LookRotation(along.normalized, aim * Vector3.up) * weaponAlign;
+                }
+            }
         }
 
         private static void Reach(Transform bone, Vector3 effector, Vector3 target)

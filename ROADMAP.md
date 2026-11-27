@@ -126,14 +126,14 @@ Disable leaderboard submission for co-op runs (Daily, Endless, Classic), or tag 
 | Daily | same seed for all; leaderboard off (item 13) |
 | Challenge rooms | platform challenge stays per player; combat challenge via item 4 |
 
-## P3 — quality of life
+## P3 — quality of life 🔶 *(0.10.0, needs testing)*
 
-- **Downed spectator:** a downed player can watch an ally (camera follow).
-- **Ping marker:** a key to mark a spot or an enemy for the others.
-- **Join in progress:** spawn next to the host instead of skipping floors one by one.
-- **Host leaving:** clean end of session for clients (return to menu, keep progress); later, host migration.
-- **Held weapon:** wrist and gauntlet weapons placed on the forearm instead of in the hand.
-- **Installer / updater.**
+- 🔶 **Downed spectator:** while downed, the camera follows a standing ally (mouse orbits, Space for the next ally).
+- 🔶 **Ping marker:** middle click marks the spot or enemy you look at for everyone (8 s, shown off-screen too).
+- 🔶 **Join in progress:** a late joiner starts directly on the host's floor, next to the host, with the host's visited and cleared rooms.
+- 🔶 **Host leaving:** clients get a notice and keep playing solo; synced enemies get their own AI back.
+- 🔶 **Held weapon:** gauntlet-like weapons (id keywords, configurable) are worn on the forearm.
+- ⬜ **Installer / updater.**
 
 ## Technical notes
 

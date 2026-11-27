@@ -68,6 +68,17 @@ namespace ZigguratMP.Sync
                 ExtraSpecialRooms = p.ExtraSpecialRooms,
             };
             floors[info.Level] = info;
+            // Late joiners start on the host's current floor.
+            if (HostRunJson != null)
+            {
+                try
+                {
+                    JObject run = JObject.Parse(HostRunJson);
+                    run["level"] = StageParameters.DungeonLevel;
+                    HostRunJson = run.ToString(Formatting.None);
+                }
+                catch (JsonException) { }
+            }
             LastInfo = $"Floor {info.Level} seed {info.Seed}";
             Plugin.Log.LogInfo($"[host] {LastInfo}");
             Session.BroadcastFloorInfo(info);
@@ -314,6 +325,14 @@ namespace ZigguratMP.Sync
                 {
                     if (save.CurrentExtraModes == null) throw new InvalidOperationException("No extra modes data in current save");
                     save.CurrentExtraModes.LoadGame(mission);
+                }
+                // Joining a run in progress: start directly on the host's floor (the scene loads after this).
+                int startLevel = (int?)j["level"] ?? 1;
+                if (startLevel > 1)
+                {
+                    HarmonyLib.AccessTools.PropertySetter(typeof(StageParameters), nameof(StageParameters.DungeonLevel))?.Invoke(null, new object[] { startLevel });
+                    ComfortSync.JoinTeleportPending = true;
+                    Plugin.Log.LogInfo($"[client] Joining the run in progress on floor {startLevel}");
                 }
             }
             finally { startingHostRun = false; }

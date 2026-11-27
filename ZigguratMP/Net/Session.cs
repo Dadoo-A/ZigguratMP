@@ -35,6 +35,7 @@ namespace ZigguratMP.Net
         private static Callback<LobbyChatUpdate_t> chatUpdateCb;
 
         private static float steamRetryTimer;
+        private static CSteamID lastHostId = CSteamID.Nil;
         private static float sendTimer;
         private static ulong launchLobbyArg;
 
@@ -118,6 +119,7 @@ namespace ZigguratMP.Net
             PortalSync.Tick(dt);
             BalanceSync.Tick();
             SummonSync.Tick(dt);
+            ComfortSync.Tick();
             ReadyRoom.Tick();
             UI.AllyHud.Tick(dt);
         }
@@ -162,6 +164,7 @@ namespace ZigguratMP.Net
             PortalSync.Reset();
             BalanceSync.Reset();
             SummonSync.Reset();
+            ComfortSync.Reset();
             GatherSync.Reset();
             ReadyRoom.Reset();
             UI.AllyHud.Reset();
@@ -212,6 +215,7 @@ namespace ZigguratMP.Net
 
             LobbyId = lobby;
             RefreshMembers();
+            lastHostId = HostId;
             Status = IsHost ? "Hosting lobby" : $"Joined {SteamFriends.GetFriendPersonaName(HostId)}'s lobby";
             Plugin.Log.LogInfo(Status);
 
@@ -243,6 +247,13 @@ namespace ZigguratMP.Net
             else
             {
                 Plugin.Log.LogInfo($"{SteamFriends.GetFriendPersonaName(who)} left ({change})");
+                if (who == lastHostId && who != LocalId)
+                {
+                    // Steam would hand the lobby to a client mid-run: end the session cleanly instead.
+                    ComfortSync.OnHostLeft(SteamFriends.GetFriendPersonaName(who));
+                    Leave();
+                    return;
+                }
                 transport.Close(who);
                 welcomed.Remove(who);
                 RemotePlayers.Remove(who);
@@ -489,6 +500,12 @@ namespace ZigguratMP.Net
                         break;
                     case MsgType.EnemyModifier:
                         BalanceSync.OnEnemyModifier(from, r);
+                        break;
+                    case MsgType.Ping3D:
+                        ComfortSync.OnPing(from, r);
+                        break;
+                    case MsgType.RoomStateRequest when IsHost:
+                        ComfortSync.OnRoomStateRequest(from, r);
                         break;
                     case MsgType.PortalReady:
                         PortalSync.OnPortalReady(from, r);

@@ -14,7 +14,7 @@ namespace ZigguratMP
     {
         public const string Guid = "com.zigguratmp.coop";
         public const string Name = "Ziggurat MP";
-        public const string Version = "0.9.0";
+        public const string Version = "0.10.0";
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -27,6 +27,9 @@ namespace ZigguratMP
         internal static ConfigEntry<float> EnemyCountPerPlayer;
         internal static ConfigEntry<float> ChampionChancePerPlayer;
         internal static ConfigEntry<bool> SharedEconomy;
+        internal static ConfigEntry<KeyCode> PingKey;
+        internal static ConfigEntry<KeyCode> SpectateNextKey;
+        internal static ConfigEntry<string> ForearmWeapons;
         internal static ConfigEntry<float> InterpDelay;
         internal static ConfigEntry<float> EnemyHealthPerPlayer;
         internal static ConfigEntry<float> BossHealthPerPlayer;
@@ -46,6 +49,9 @@ namespace ZigguratMP
             EnemyCountPerPlayer = Config.Bind("Difficulty", "EnemyCountPerPlayer", 0.35f, "Host: extra fight threat (more / tougher waves) per additional player (0.35 = +35%).");
             ChampionChancePerPlayer = Config.Bind("Difficulty", "ChampionChancePerPlayer", 0.25f, "Host: extra champion chance per additional player.");
             SharedEconomy = Config.Bind("Coop", "SharedEconomy", false, "Host: fountains, shrines and shop items are used up for everyone when one player uses them (off = each player has their own).");
+            PingKey = Config.Bind("General", "PingKey", KeyCode.Mouse2, "Mark the spot (or enemy) you are looking at for the other players.");
+            SpectateNextKey = Config.Bind("General", "SpectateNextKey", KeyCode.Space, "While downed: switch the spectator camera to the next ally.");
+            ForearmWeapons = Config.Bind("Visuals", "ForearmWeapons", "gauntlet,glove,claw,fist,bracer,knuckle,gaunt,hand", "Weapon id keywords (comma separated) shown on the forearm of remote players instead of held in the hand.");
             InterpDelay = Config.Bind("Network", "InterpDelay", 0.15f, "Seconds remote players are shown behind real time (higher = smoother, more delay).");
             EnemyHealthPerPlayer = Config.Bind("Difficulty", "EnemyHealthPerPlayer", 0.6f, "Host: extra enemy health per additional player (0.6 = +60%).");
             BossHealthPerPlayer = Config.Bind("Difficulty", "BossHealthPerPlayer", 0.75f, "Host: extra boss health per additional player.");
@@ -57,12 +63,19 @@ namespace ZigguratMP
             Log.LogInfo($"{Name} {Version} loaded. Press {MenuKey.Value} for the multiplayer menu.");
         }
 
+        private void LateUpdate()
+        {
+            Sync.ComfortSync.LateTick();
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(MenuKey.Value))
                 MpMenu.Visible = !MpMenu.Visible;
             if (Input.GetKeyDown(ShareKey.Value))
                 Sync.ItemShare.TryShare();
+            if (Input.GetKeyDown(PingKey.Value))
+                Sync.ComfortSync.TryPing();
 
             Session.Tick(Time.unscaledDeltaTime);
         }
@@ -74,6 +87,7 @@ namespace ZigguratMP
             Sync.DownedSync.DrawHud();
             Sync.ItemShare.DrawHud();
             Sync.PortalSync.DrawHud();
+            Sync.ComfortSync.DrawHud();
             Sync.ReadyRoom.DrawOverlay();
         }
 
