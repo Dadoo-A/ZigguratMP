@@ -18,10 +18,26 @@ namespace ZigguratMP.Patches
         private static void Prefix(BaseStageScript __instance) => CoopPause.BeforePause(__instance);
     }
 
+    /// <summary>
+    /// In co-op a menu doesn't stop time, but the game never expects hits while paused (a hit with
+    /// the map open broke the player). Players in a menu take no damage and no knockback.
+    /// </summary>
     [HarmonyPatch(typeof(Player), nameof(Player.Hurt))]
     internal static class MenuDamagePatch
     {
-        private static void Prefix(ref DamageData damage) => CoopPause.ScaleMenuDamage(ref damage);
+        private static bool Prefix(ref bool __result)
+        {
+            if (!CoopPause.InMenu) return true;
+            __result = false;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(Player), nameof(Player.ApplyImpulse))]
+    internal static class MenuImpulsePatch
+    {
+        private static bool Prefix(Vector3 vector) =>
+            !CoopPause.InMenu && !(float.IsNaN(vector.x) || float.IsNaN(vector.y) || float.IsNaN(vector.z));
     }
 
     // ---------------------------------------------------------------- 2-3. gathering

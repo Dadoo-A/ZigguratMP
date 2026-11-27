@@ -30,7 +30,7 @@ The game sets `Time.timeScale = 0` for the pause menu, the **level-up perk scree
 
 Plan:
 - Keep time running while any menu is open.
-- Make a player in a menu harder to hit (damage reduction), and show "in menu" on their name tag.
+- A player in a menu takes no damage or knockback (being hit while the game is "paused" broke the player), and shows "in menu" on their name tag.
 - Optional: a host-only "pause all" that freezes everyone together.
 
 ### 2. Fight start and allies left outside 🔶 *(0.8.0, needs testing)*

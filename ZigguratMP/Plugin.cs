@@ -14,7 +14,7 @@ namespace ZigguratMP
     {
         public const string Guid = "com.zigguratmp.coop";
         public const string Name = "Ziggurat MP";
-        public const string Version = "0.10.0";
+        public const string Version = "0.10.1";
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -65,6 +65,7 @@ namespace ZigguratMP
 
         private void LateUpdate()
         {
+            Sync.CoopPause.WatchPlayer();
             Sync.ComfortSync.LateTick();
         }
 

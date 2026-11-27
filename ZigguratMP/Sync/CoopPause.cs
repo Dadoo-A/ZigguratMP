@@ -8,13 +8,11 @@ namespace ZigguratMP.Sync
     /// <summary>
     /// The game stops time (timeScale 0) for the pause menu, level-up perks, map, omens and the
     /// character sheet. In co-op that would freeze the host's enemies for everyone (or desync a
-    /// client), so menus keep time running; a player in a menu takes reduced damage and shows
+    /// client), so menus keep time running; a player in a menu takes no damage or knockback and shows
     /// [MENU] to the others.
     /// </summary>
     internal static class CoopPause
     {
-        private const float MenuDamageMultiplier = 0.5f;
-
         private static readonly AccessTools.FieldRef<BaseStageScript, bool> PauseWithTimeScale =
             AccessTools.FieldRefAccess<BaseStageScript, bool>("PauseWithTimeScale");
 
@@ -29,10 +27,25 @@ namespace ZigguratMP.Sync
             PauseWithTimeScale(stage) = !Active;
         }
 
-        /// <summary>Player.Hurt prefix: softer hits while in a menu (time keeps running in co-op).</summary>
-        public static void ScaleMenuDamage(ref Logic.DamageData damage)
+        private static Vector3 lastGoodPos;
+        private static bool hasGoodPos;
+        private static Player watched;
+
+        /// <summary>
+        /// Safety net: if the local player's position ever becomes NaN/Infinity (white screen,
+        /// stuck player), put them back where they last were valid.
+        /// </summary>
+        public static void WatchPlayer()
         {
-            if (InMenu) damage.Damage.Damage *= MenuDamageMultiplier;
+            Player p = LocalPlayerAccess.Get();
+            if (p == null) { hasGoodPos = false; watched = null; return; }
+            if (p != watched) { watched = p; hasGoodPos = false; }
+            Vector3 pos = p.transform.position;
+            bool bad = float.IsNaN(pos.x) || float.IsNaN(pos.y) || float.IsNaN(pos.z) || float.IsInfinity(pos.sqrMagnitude);
+            if (!bad) { lastGoodPos = pos; hasGoodPos = true; return; }
+            if (!hasGoodPos || p.Controller == null) return;
+            Plugin.Log.LogWarning($"Local player position became invalid ({pos}); restoring {lastGoodPos}");
+            p.Controller.Teleport(lastGoodPos + Vector3.up * 0.2f);
         }
     }
 
